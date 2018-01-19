@@ -73,7 +73,7 @@ Standard Deviations of each sample were 3.56 and 4.8, respectively.
 ### 4. Provide one or two visualizations that show the distribution of the sample data. Write one or two sentences noting what you observe about the plot or plots.
 
 ### Getting the data in a format for single plot analysis
-```{r}
+```{r Comparison of Results}
 stroop2 = melt.data.table(stroop,measure.vars =c("Congruent","Incongruent"))
 head(stroop2,5)
 ```
