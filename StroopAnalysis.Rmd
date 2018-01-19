@@ -36,16 +36,23 @@ Dependent Variable: Performance on test under treatments
 
 ### 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices.
 
-According to documentation on previous studies, performance in the incongruent treatment is expected to be lower than performance under congruent treatment. 
+Here, we are using a sample of the population, which we do not know much about, to make inferences in the population. Specifically, we are trying to measure whether there are differences in means from Congruent and Incongruent in the population.   
 
-Therefore, it is appropriate to have an alternative hypothesis that shows that there is lower perofrmance under the incongruent treatment. As what is being measured here is the time it takes to correctly state the color, the higher a score indicates worse performance.
+This is a dependent test, where the same sample is tested pre and post treatment.
 
-Thus, the hypotheses would be as follows:
+The Null Hypothesis would be that sample mean performance time for the Congruent sample are equal to mean performance time in the Incongruent sample.
 
-H0: XbarCongruent >= XbarNonCongruent
-HA: XbarCongruent < XbarNonCongruent
+The Alternative Hypothesis would be that the mean performance time of the Incongruent sample is not equal to the mean performance time of the Congruent sample.
 
-As this is a pre/post treatment design, I expect to use a one-sample t-test. This way I can compare populations.
+Thus, the hypotheses would be represented as follows:
+
+H0: μCongruent = μIncongruent
+
+HA: μCongruent != μIncongruent
+
+The number of samples is 24. We do not know the population standard deviation, nor if the distribution of either treatment is normal. 
+
+With a low number of samples, and not much information on the population SD, a t-test would be the best fit for analysis. The hypotheses above have been chosen to avoid a strong assumption, thus resulting in a two-tailed t-test.
 
 #### Loading in the data
 
@@ -80,56 +87,95 @@ head(stroop2,5)
 
 Melting the data tables will allow plotting of both histograms in the same plot, simply by separating by variable (Congruent, Incongruent).
 
-```{r}
-ggplot(stroop2, aes(x = value,color=variable,fill=variable,alpha =0.8)) + geom_histogram(binwidth = 1)
-
+```{r Comparison of Results- Histogram}
+ggplot(stroop2, aes(x = value,color=variable,fill=variable,alpha =0.8)) +
+  geom_histogram(binwidth = 1) +
+  ggtitle("Fig. 1: Comparison of Treatment Distributions (n=24)") + ylab("Frequency") +
+  xlab("Value")
 ```
 
 The distribution of Incongruent values has a higher center- there are no values below 15, while the Congruent distribution starts at 8. Incongruent results also have a larger max- values extend to 35. 
 
+```{r Comparison of Results - Bar Plot}
+ggplot(stroop2, aes(y = value,x=variable,color=variable,fill=variable,alpha =0.8)) +
+  geom_boxplot() +
+  ggtitle("Fig. 2: Comparison of Performance Time by Treatment (n=24)") + ylab("Performance Time (seconds)") +
+  xlab("Treatment") + theme(legend.position = "none")
+
+```
+
+We can visualize the center of each sample's treatment performance better with this boxplot. IT is clear that the Incongruent treatment had a higher mean and range. The minimum performacne time Incongruent treatment is larger than the mean of the Congruent performance time.  
+
 ### 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
 
-Let's now run the data through a t-test. We will use a 95% Confidence level, which with 46 degrees of freedom translates a t critical value of -1.676. 
+Let's now run the data through a t-test. We will use a 95% Confidence level, which with 46 degrees of freedom translates a t critical value of +/- 2.069. 
+
+```{r}
+tcrit = 2.069
+```
 
 We can calculate the t-statistic thus:
 
-tstat = (xBar1 - xBar2) / StandardError
+tstat = (μDifference) / StandardError
 
-We need to calculate standard error, which we can do via this formula:
-
-SquareRoot( (sd1^2/n1)  + (sd2^2/n2) )
-
-#### Calculating standard error
+#### Calculating standard deviation of the difference
 ```{r}
-#calculating standard deviations
-sdC = sd(stroop$Congruent)
-sdI = sd(stroop$Incongruent)
+# Calculate the Differences (Congruent - Incongruent) of each test
+stroop$diff <- stroop$Congruent - stroop$Incongruent
 
-stdError = sqrt((sdC^2/length(stroop$Congruent)) + 
-                  (sdI^2/length(stroop$Incongruent)))
-stdError
+# Calculate the squared deviations difference - ((Differences of Congruent and Incongruent)-Mean difference)^2
+MeanDiff = mean(stroop$diff)
+stroop$sqdDif <- (stroop$diff - MeanDiff)^2
+
+# Sum the squared deviations difference
+SumSqdDiff <- sum(stroop$sqdDif)
+
+# Divide it by the number of samples - 1 to achieve the Variance Difference.
+df = n - 1
+VarianceDiff <- SumSqdDiff/df
+
+# Square root the Variance Difference
+StandarDeviationDifference = sqrt(VarianceDiff)
+
 ```
 
 #### Calculating T statistic
 ```{r}
-tstat = (xBarC - xBarI)/stdError
-tstat
+#Calucate standard error
+SE = StandarDeviationDifference/(sqrt(n))
+
+#Caluclate T statistic
+t = (MeanDiff)/(SE)
+t
 ```
 
 #### Calculating the Confidence Interval
 
 CI Formula: 
 
-XBarDiff +/- tcrit * SE
+μDifference +/- tcrit * SE
 
 ```{r}
 XbarDiff = xBarC - xBarI
 
-MarginError = 1.676 * stdError
+MarginError = tcrit * SE
 CI = c(XbarDiff - MarginError, XbarDiff + MarginError)
 CI
 ```
 
-With t-statistic (-6.53) < t-critical (-1.676), p < .05, we reject the null hypothesis.The 95% Confidence Interval is (-10.00, -5.92). The evidence suggests that there is worse performance when undergoing the incongruent treatment than the congruent treatment. 
+With t-statistic (-8.02) < t-critical (+/- 2.069), p < .05, and 24 degrees of freedom, we reject the null hypothesis.The 95% Confidence Interval is (-10.02, -5.91). The evidence suggests that there is worse performance when undergoing the incongruent treatment than the congruent treatment. 
+
+### Resources
+
+1) A Discussion on Stack Overflow about Degrees of Freedom:  https://stats.stackexchange.com/questions/16921/how-to-understand-degrees-of-freedom
+
+2) T-table:
+https://s3.amazonaws.com/udacity-hosted-downloads/t-table.jpg
+
+3) A Stroop Effect applet: 
+https://faculty.washington.edu/chudler/java/ready.html
+
+4) Stroop Effect Wiki:
+https://en.wikipedia.org/wiki/Stroop_effect
 
 
