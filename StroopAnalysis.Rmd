@@ -1,0 +1,135 @@
+---
+title: "The Stroop Effect: A Statistical Analysis in R"
+author: "Jacob Dodd"
+date: "1/18/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(infer)
+library(data.table)
+library(ggplot2)
+library(dplyr)
+library(skimr)
+library(reshape2)
+library(ANOVAreplication)
+```
+# Background
+
+In a stroop task, participants are tasked with reading words in certain text colors and saying what the text color of the word is. There are 2 possibilities for this:
+
+1) Congruent - the word matches the text color (ex: Blue is colored blue)
+2) Incongruent - the word does not match the text color (ex: blue is colored red)
+
+The goal of this short project is to investigate a Stroop effect dataset and run it through statistical analyses to see if the populations are significantly different. 
+
+
+### 1. What is our independent variable? What is our dependent variable?
+
+Independent Variable: treatment of test (congruent/incongruent)
+
+Dependent Variable: Performance on test under treatments
+
+### 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices.
+
+According to documentation on previous studies, performance in the incongruent treatment is expected to be lower than performance under congruent treatment. 
+
+Therefore, it is appropriate to have an alternative hypothesis that shows that there is lower perofrmance under the incongruent treatment. As what is being measured here is the time it takes to correctly state the color, the higher a score indicates worse performance.
+
+Thus, the hypotheses would be as follows:
+
+H0: XbarCongruent >= XbarNonCongruent
+HA: XbarCongruent < XbarNonCongruent
+
+As this is a pre/post treatment design, I expect to use a one-sample t-test. This way I can compare populations.
+
+#### Loading in the data
+
+This data was obtained via Udacity's Data Analyst Nanodegree program, Inferential Statistics course. Data was copied from a google doc and exported as a csv file.
+
+```{r}
+stroop = fread("~/Desktop/EDA-Project-Master-Dodd/stroopdata.csv")
+stroop <- subset(stroop, is.na(stroop$Congruent)==FALSE)
+stroop
+```
+Each row of the dataset contains the performance for one participant, with the first number their results on the congruent task and the second number their performance on the incongruent task.
+
+### 3. Report some descriptive statistics regarding this dataset. Include at least one measure of central tendency and at least one measure of variability.
+
+```{r}
+xBarC = mean(stroop$Congruent)
+xBarI = mean(stroop$Incongruent)
+n = nrow(stroop)
+
+skim(stroop)
+```
+The mean of the Congruent Sample was 14.05, while the mean of the Incongruent sample was 22.02.
+Standard Deviations of each sample were 3.56 and 4.8, respectively.
+
+### 4. Provide one or two visualizations that show the distribution of the sample data. Write one or two sentences noting what you observe about the plot or plots.
+
+### Getting the data in a format for single plot analysis
+```{r}
+stroop2 = melt.data.table(stroop,measure.vars =c("Congruent","Incongruent"))
+head(stroop2,5)
+```
+
+Melting the data tables will allow plotting of both histograms in the same plot, simply by separating by variable (Congruent, Incongruent).
+
+```{r}
+ggplot(stroop2, aes(x = value,color=variable,fill=variable,alpha =0.8)) + geom_histogram(binwidth = 1)
+
+```
+
+The distribution of Incongruent values has a higher center- there are no values below 15, while the Congruent distribution starts at 8. Incongruent results also have a larger max- values extend to 35. 
+
+### 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
+
+Let's now run the data through a t-test. We will use a 95% Confidence level, which with 46 degrees of freedom translates a t critical value of -1.676. 
+
+We can calculate the t-statistic thus:
+
+tstat = (xBar1 - xBar2) / StandardError
+
+We need to calculate standard error, which we can do via this formula:
+
+SquareRoot( (sd1^2/n1)  + (sd2^2/n2) )
+
+#### Calculating standard error
+```{r}
+#calculating standard deviations
+sdC = sd(stroop$Congruent)
+sdI = sd(stroop$Incongruent)
+
+stdError = sqrt((sdC^2/length(stroop$Congruent)) + 
+                  (sdI^2/length(stroop$Incongruent)))
+stdError
+```
+
+#### Calculating T statistic
+```{r}
+tstat = (xBarC - xBarI)/stdError
+tstat
+```
+
+#### Calculating the Confidence Interval
+
+CI Formula: 
+
+XBarDiff +/- tcrit * SE
+
+```{r}
+XbarDiff = xBarC - xBarI
+
+MarginError = 1.676 * stdError
+CI = c(XbarDiff - MarginError, XbarDiff + MarginError)
+CI
+```
+
+With t-statistic (-6.53) < t-critical (-1.676), p < .05, we reject the null hypothesis.The 95% Confidence Interval is (-10.00, -5.92). The evidence suggests that there is worse performance when undergoing the incongruent treatment than the congruent treatment. 
+
+
