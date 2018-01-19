@@ -20,7 +20,7 @@ library(ANOVAreplication)
 ```
 # Background
 
-In a stroop task, participants are tasked with reading words in certain text colors and saying what the text color of the word is. There are 2 possibilities for this:
+In a Stroop task, participants are tasked with reading words in certain text colors and saying what the text color of the word is. There are 2 possibilities for this:
 
 1) Congruent - the word matches the text color (ex: Blue is colored blue)
 2) Incongruent - the word does not match the text color (ex: blue is colored red)
@@ -44,17 +44,16 @@ H0: Null Hypothesis
 
 HA: Alternative Hypothesis
 
-μCongruent = Sample mean of Congruent performance (in seconds)
+μCongruent = Population mean of Congruent performance (in seconds)
 
-μIncongruent = Sample mean of Incongruent performance (in seconds)
+μIncongruent = Population mean of Incongruent performance (in seconds)
 
 #### Hypotheses
-
 This is a dependent test, where the same sample is tested pre and post treatment.
 
-The Null Hypothesis would be that there is no difference in sample mean performance time for the Congruent and Incongruent samples.
+The Null Hypothesis would be that there is no difference in population mean performance time for the Congruent and Incongruent treatments.
 
-The Alternative Hypothesis would be that there is a significant difference in sample mean performance time for the Congruent and Incongruent samples.
+The Alternative Hypothesis would be that there is a significant difference in population mean performance time for the Congruent and Incongruent treatments.
 
 Thus, the hypotheses would be represented as follows:
 
@@ -63,17 +62,13 @@ H0: μCongruent = μIncongruent
 HA: μCongruent != μIncongruent
 
 #### Assumptions and Methodology
-
 The number of samples is 24. We do not know the population standard deviation, nor if the distribution of either treatment is normal. 
 
 With a low number of samples, and not much information on the population SD, a t-test would be the best fit for analysis. The hypotheses above have been chosen to avoid a strong assumption, thus resulting in a two-tailed t-test.
 
 #### Loading in the data
-
-This data was obtained via Udacity's Data Analyst Nanodegree program, Inferential Statistics course. Data was copied from a google doc and exported as a csv file.
-
 ```{r}
-stroop = fread("~/Desktop/EDA-Project-Master-Dodd/stroopdata.csv")
+stroop = fread("stroopdata.csv")
 stroop <- subset(stroop, is.na(stroop$Congruent)==FALSE)
 stroop
 ```
