@@ -25,7 +25,7 @@ In a stroop task, participants are tasked with reading words in certain text col
 1) Congruent - the word matches the text color (ex: Blue is colored blue)
 2) Incongruent - the word does not match the text color (ex: blue is colored red)
 
-The goal of this short project is to investigate a Stroop effect dataset and run it through statistical analyses to see if the populations are significantly different. 
+The goal of this short project is to investigate a Stroop effect dataset and run it through statistical analyses to see if there is evidence for a significant difference in the whole population's Stroop test performance under different treatments, Congruent and Incongruent. 
 
 
 ### 1. What is our independent variable? What is our dependent variable?
@@ -36,19 +36,33 @@ Dependent Variable: Performance on test under treatments
 
 ### 2. What is an appropriate set of hypotheses for this task? What kind of statistical test do you expect to perform? Justify your choices.
 
-Here, we are using a sample of the population, which we do not know much about, to make inferences in the population. Specifically, we are trying to measure whether there are differences in means from Congruent and Incongruent in the population.   
+Here, we are using a sample of the population, which we do not know much about, to make inferences in the population. Specifically, we are trying to measure whether there are differences in performance means (in seconds) from Congruent and Incongruent Stroop test treatments in the population.   
+
+#### Explanation of Symbols
+
+H0: Null Hypothesis
+
+HA: Alternative Hypothesis
+
+μCongruent = Sample mean of Congruent performance (in seconds)
+
+μIncongruent = Sample mean of Incongruent performance (in seconds)
+
+#### Hypotheses
 
 This is a dependent test, where the same sample is tested pre and post treatment.
 
-The Null Hypothesis would be that sample mean performance time for the Congruent sample are equal to mean performance time in the Incongruent sample.
+The Null Hypothesis would be that there is no difference in sample mean performance time for the Congruent and Incongruent samples.
 
-The Alternative Hypothesis would be that the mean performance time of the Incongruent sample is not equal to the mean performance time of the Congruent sample.
+The Alternative Hypothesis would be that there is a significant difference in sample mean performance time for the Congruent and Incongruent samples.
 
 Thus, the hypotheses would be represented as follows:
 
 H0: μCongruent = μIncongruent
 
 HA: μCongruent != μIncongruent
+
+#### Assumptions and Methodology
 
 The number of samples is 24. We do not know the population standard deviation, nor if the distribution of either treatment is normal. 
 
@@ -108,7 +122,7 @@ We can visualize the center of each sample's treatment performance better with t
 
 ### 5. Now, perform the statistical test and report your results. What is your confidence level and your critical statistic value? Do you reject the null hypothesis or fail to reject it? Come to a conclusion in terms of the experiment task. Did the results match up with your expectations?
 
-Let's now run the data through a t-test. We will use a 95% Confidence level, which with 46 degrees of freedom translates a t critical value of +/- 2.069. 
+Let's now run the data through a t-test. We will use a 95% Confidence level, which with 23 degrees of freedom translates a t critical value of +/- 2.069. 
 
 ```{r}
 tcrit = 2.069
@@ -163,7 +177,7 @@ CI = c(XbarDiff - MarginError, XbarDiff + MarginError)
 CI
 ```
 
-With t-statistic (-8.02) < t-critical (+/- 2.069), p < .05, and 24 degrees of freedom, we reject the null hypothesis.The 95% Confidence Interval is (-10.02, -5.91). The evidence suggests that there is worse performance when undergoing the incongruent treatment than the congruent treatment. 
+With t-statistic (-8.02) < t-critical (+/- 2.069), p < .05, and 23 degrees of freedom, we reject the null hypothesis.The 95% Confidence Interval is (-10.02, -5.91). The evidence suggests that there is worse performance when undergoing the incongruent treatment than the congruent treatment. 
 
 ### Resources
 
@@ -178,4 +192,6 @@ https://faculty.washington.edu/chudler/java/ready.html
 4) Stroop Effect Wiki:
 https://en.wikipedia.org/wiki/Stroop_effect
 
+5) Resource on Hypothesis by Durham College
+https://durhamcollege.ca/wp-content/uploads/STAT_nullalternate_hypothesis.pdf
 
